@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Cost Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .calculator-container {
+            width: 600px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .calculator-body {
+            padding: 25px;
+        }
+        
+        .input-section {
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            font-size: 18px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .item-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+        
+        .item-row label {
+            flex: 1;
+            font-weight: 500;
+            color: #34495e;
+        }
+        
+        input[type="number"] {
+            flex: 2;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+        
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        .btn-remove {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        
+        .btn-remove:hover {
+            background: #c0392b;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        .cost-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .cost-group {
+            margin-bottom: 15px;
+        }
+        
+        .cost-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #34495e;
+        }
+        
+        .btn-primary {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background: #219653;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(39, 174, 96, 0.3);
+        }
+        
+        .results-section {
+            margin-top: 25px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .summary-card {
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .summary-card h3 {
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .summary-item {
+            text-align: center;
+        }
+        
+        .summary-value {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        th {
+            background: #34495e;
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .highlight {
+            background: #27ae60;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .formula-note {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 15px;
+            text-align: center;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <header>
+            <h1>Product Cost Calculator</h1>
+            <p class="subtitle">Calculate true product costs with allocated expenses</p>
+        </header>
+        
+        <div class="calculator-body">
+            <form id="costCalculator">
+                <div class="input-section">
+                    <h2>Product Costs</h2>
+                    <div id="items-container">
+                        <div class="item-row" data-id="1">
+                            <label for="itemValue1">Product A Cost (N):</label>
+                            <input type="number" id="itemValue1" class="item-value" step="0.01" min="0.01" placeholder="e.g., 100.00" required>
+                            <button type="button" class="btn-remove" style="display: none;">&times;</button>
+                        </div>
+                    </div>
+                    <button type="button" id="add-item-btn" class="btn-secondary">
+                        <span>+</span> Add Another Product
+                    </button>
+                </div>
+                
+                <div class="input-section">
+                    <h2>Shared Operational Costs</h2>
+                    <div class="cost-inputs">
+                        <div class="cost-group">
+                            <label for="totalShipping">Shipping Fees (N):</label>
+                            <input type="number" id="totalShipping" step="0.01" min="0" placeholder="e.g., 50.00" required>
+                        </div>
+                        <div class="cost-group">
+                            <label for="totalMarketing">Marketing & Data (N):</label>
+                            <input type="number" id="totalMarketing" step="0.01" min="0" placeholder="e.g., 75.00" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="button" id="calculate-btn" class="btn-primary">Calculate Total Costs</button>
+            </form>
+            
+            <div id="results-section" class="results-section">
+                <h2>Cost Breakdown</h2>
+                <div class="summary-card">
+                    <h3>Summary Totals</h3>
+                    <div class="summary-grid" id="summary-totals">
+                        <!-- Summary will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table id="results-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Base Cost</th>
+                                <th>Shipping</th>
+                                <th>Marketing</th>
+                                <th class="highlight">Total Cost</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-body">
+                            <!-- Results will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <p class="formula-note">
+                    Formula: Allocated Cost = (Item Value / Total Items Value) × Shared Cost
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const itemsContainer = document.getElementById('items-container');
+            const addItemBtn = document.getElementById('add-item-btn');
+            const calculateBtn = document.getElementById('calculate-btn');
+            const resultsSection = document.getElementById('results-section');
+            const resultsBody = document.getElementById('results-body');
+            const summaryTotals = document.getElementById('summary-totals');
+
+            let itemCounter = 1;
+
+            // Add new item row
+            addItemBtn.addEventListener('click', function() {
+                itemCounter++;
+                const newItemRow = document.createElement('div');
+                newItemRow.className = 'item-row';
+                newItemRow.setAttribute('data-id', itemCounter);
+                newItemRow.innerHTML = `
+                    <label for="itemValue${itemCounter}">Product ${String.fromCharCode(64 + itemCounter)} Cost ($):</label>
+                    <input type="number" id="itemValue${itemCounter}" class="item-value" step="0.01" min="0.01" placeholder="e.g., 100.00" required>
+                    <button type="button" class="btn-remove">&times;</button>
+                `;
+                itemsContainer.appendChild(newItemRow);
+
+                // Show remove buttons when there's more than one item
+                document.querySelectorAll('.btn-remove').forEach(btn => {
+                    btn.style.display = 'block';
+                });
+            });
+
+            // Remove item row
+            itemsContainer.addEventListener('click', function(e) {
+                if (e.target.classList.contains('btn-remove')) {
+                    const itemRow = e.target.closest('.item-row');
+                    if (document.querySelectorAll('.item-row').length > 1) {
+                        itemsContainer.removeChild(itemRow);
+                        
+                        // Hide remove button if only one item remains
+                        if (document.querySelectorAll('.item-row').length === 1) {
+                            document.querySelector('.btn-remove').style.display = 'none';
+                        }
+                    }
+                }
+            });
+
+            // Main calculation function
+            calculateBtn.addEventListener('click', function() {
+                // Gather all item values
+                const itemValueInputs = document.querySelectorAll('.item-value');
+                const itemValues = [];
+                let totalItemValue = 0;
+
+                itemValueInputs.forEach(input => {
+                    const value = parseFloat(input.value) || 0;
+                    if (value > 0) {
+                        itemValues.push(value);
+                        totalItemValue += value;
+                    }
+                });
+
+                // Get shared costs
+                const totalShipping = parseFloat(document.getElementById('totalShipping').value) || 0;
+                const totalMarketing = parseFloat(document.getElementById('totalMarketing').value) || 0;
+
+                // Validation
+                if (itemValues.length === 0) {
+                    alert("Please enter at least one product with a cost greater than N0.00.");
+                    return;
+                }
+                if (totalItemValue <= 0) {
+                    alert("Total product cost must be greater than N0.00.");
+                    return;
+                }
+
+                // Perform calculations
+                const results = [];
+                let grandTotalAllItems = 0;
+
+                itemValues.forEach((itemValue, index) => {
+                    // Calculate allocation ratios (multiplication happens in background)
+                    const allocationRatio = itemValue / totalItemValue;
+                    
+                    const allocatedShipping = allocationRatio * totalShipping;
+                    const allocatedMarketing = allocationRatio * totalMarketing;
+                    const grandTotalPerItem = itemValue + allocatedShipping + allocatedMarketing;
+                    
+                    grandTotalAllItems += grandTotalPerItem;
+
+                    results.push({
+                        productName: String.fromCharCode(65 + index),
+                        baseCost: itemValue,
+                        allocatedShipping: allocatedShipping,
+                        allocatedMarketing: allocatedMarketing,
+                        grandTotal: grandTotalPerItem
+                    });
+                });
+
+                // Display results
+                displayResults(results, totalItemValue, totalShipping, totalMarketing, grandTotalAllItems);
+            });
+
+            function displayResults(results, totalBase, totalShipping, totalMarketing, grandTotal) {
+                // Clear previous results
+                resultsBody.innerHTML = '';
+                summaryTotals.innerHTML = '';
+
+                // Build summary card
+                summaryTotals.innerHTML = `
+                    <div class="summary-item">
+                        <div>Total Base Cost</div>
+                        <div class="summary-value">$${totalBase.toFixed(2)}</div>
+                    </div>
+                    <div class="summary-item">
+                        <div>Profit Costs</div>
+                        <div class="summary-value">$${(totalShipping + totalMarketing).toFixed(2)}</div>
+                    </div>
+                    <div class="summary-item">
+                        <div>Grand Total</div>
+                        <div class="summary-value">$${grandTotal.toFixed(2)}</div>
+                    </div>
+                `;
+
+                // Build results table
+                results.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td><strong>Product ${item.productName}</strong></td>
+                        <td>$${item.baseCost.toFixed(2)}</td>
+                        <td>$${item.allocatedShipping.toFixed(2)}</td>
+                        <td>$${item.allocatedMarketing.toFixed(2)}</td>
+                        <td class="highlight">$${item.grandTotal.toFixed(2)}</td>
+                    `;
+                    resultsBody.appendChild(row);
+                });
+
+                // Show results section
+                resultsSection.style.display = 'block';
+                
+                // Smooth scroll to results
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        });
+    </script>
+</body>
+</html>
